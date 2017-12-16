@@ -1,0 +1,47 @@
+#header{
+	background-color: #678eba;
+	color: white;
+	padding: 5px;
+	width: 350px;
+}
+#title{
+	text-align: center;
+	font-size: 30px;
+	font-weight: bold;
+}
+#subtitle{
+	text-align: right;
+	font-size: 12px;
+}
+#content{
+	height: 300px;
+	text-align: center;
+}
+
+button{
+	color: white;
+	background-color: #678eba;
+	font-variant: small-caps;
+	width: 250px;
+	height: 50px;
+	padding: 5px;
+	font-size: 25px;
+	border-radius: 10px;
+}
+button{
+	cursor: pointer;
+}
+#signup_btn{
+	margin-top: 22%;
+}
+#login_btn{
+	margin-top: 8%;
+}
+
+#footer{
+	font-size: 12px;
+	background-color: #544c51;
+	color: white;
+	text-align: center;
+	padding: 3px;
+}
