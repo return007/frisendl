@@ -50,16 +50,41 @@
 	text-align: center;
 }
 #signup_page #username, #signup_page #email, #signup_page #password, #signup_page #confirm_password, #signup_page #submit_signup_btn{
-	font-size: 21px;
+	font-size: 20px;
 	width: 250px;
 }
 #signup_page #username{
-	margin-top: 12%;
+	margin-top: 10%;
 }
 #signup_page #email, #signup_page #password, #signup_page #confirm_password, #signup_page #submit_signup_btn{
-	margin-top: 4%;
+	margin-top: 3%;
 }
 #signup_page #submit_signup_btn{
+	color: white;
+	background-color: #678eba;
+	font-variant: small-caps;
+	padding: 5px;
+	font-size: 25px;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+#login_page{
+	display: none;
+	height: 300px;
+	text-align: center;
+}
+#login_page #username, #login_page #password, #login_page #submit_login_btn{
+	font-size: 20px;
+	width: 250px;
+}
+#login_page #username{
+	margin-top: 20%;
+}
+#login_page #password, #login_page #submit_login_btn{
+	margin-top: 3%;
+}
+#login_page #submit_login_btn{
 	color: white;
 	background-color: #678eba;
 	font-variant: small-caps;
