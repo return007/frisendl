@@ -13,12 +13,12 @@
 	text-align: right;
 	font-size: 12px;
 }
-#content{
+#homepage{
 	height: 300px;
 	text-align: center;
 }
 
-button{
+#homepage #signup_btn, #homepage #login_btn{
 	color: white;
 	background-color: #678eba;
 	font-variant: small-caps;
@@ -27,14 +27,12 @@ button{
 	padding: 5px;
 	font-size: 25px;
 	border-radius: 10px;
-}
-button{
 	cursor: pointer;
 }
-#signup_btn{
+#homepage #signup_btn{
 	margin-top: 22%;
 }
-#login_btn{
+#homepage #login_btn{
 	margin-top: 8%;
 }
 
@@ -44,4 +42,29 @@ button{
 	color: white;
 	text-align: center;
 	padding: 3px;
+}
+
+#signup_page{
+	display: none;
+	height: 300px;
+	text-align: center;
+}
+#signup_page #username, #signup_page #email, #signup_page #password, #signup_page #confirm_password, #signup_page #submit_signup_btn{
+	font-size: 21px;
+	width: 250px;
+}
+#signup_page #username{
+	margin-top: 12%;
+}
+#signup_page #email, #signup_page #password, #signup_page #confirm_password, #signup_page #submit_signup_btn{
+	margin-top: 4%;
+}
+#signup_page #submit_signup_btn{
+	color: white;
+	background-color: #678eba;
+	font-variant: small-caps;
+	padding: 5px;
+	font-size: 25px;
+	border-radius: 10px;
+	cursor: pointer;
 }
