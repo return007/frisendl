@@ -9,7 +9,7 @@ Mozilla add-on to help send files to friends
 5. Database to store information about user, friends, files and other messages.
 6. Messaging feature.
 7. Single View messages and documents... Automatically deleted once viewed.
-
+8. Able to share link of current website.
 
 ## Tentative features:
 1. Notification when someone sent a file
