@@ -105,3 +105,72 @@
 	text-align: center;
 	margin-bottom: 15px;
 }
+
+#main_page{
+	display: none;
+	height: 300px;
+}
+#navbar{
+	background-color: #678eba;
+	color: white;
+	cursor: pointer;
+	width: 350px;
+	padding: 5px;
+	height: 20px;
+}
+#upload_section_btn{
+	float: left;
+	cursor: pointer;
+	text-align: center;
+}
+#friend_section_btn{
+	float: right;
+	cursor: pointer;
+	text-align: center;
+}
+/*
+change upload -> friend after development
+*/
+#upload_section{
+	display: none;
+}
+#search_container{
+	margin-top: 20px;
+}
+#add_friend_header{
+	font-size: 15px;
+}
+#search_query{
+	width: 250px;
+	font-size: 15px;
+}
+#go_btn{
+	width: 100px;
+	font-size: 15px;
+	cursor: pointer;
+}
+#friend_list_header{
+	font-size: 16px;
+	text-align: center;
+	color: white;
+	background-color: #544c51;
+	width: 100%;
+	height: 20px;
+	padding: 1px;
+	margin-top: 20px;
+	font-weight: bolder;
+}
+#friend_list{
+	width: 100%;
+	border: 1px solid black;
+	margin-top: 3px;
+	height: 210px;
+	overflow-y: auto;
+}
+.friend{
+	background-color: #b1afa6;
+	width: 100%;
+	border-bottom: 1px solid grey; 
+	cursor: pointer;
+	height: 50px;
+}
