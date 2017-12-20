@@ -93,11 +93,13 @@ function show_upload_section(){
 }
 
 function show_search_result(){
-
 	var search_query = document.getElementById("search_query").value;
 	if(is_empty(search_query)){
 		return;
 	}
+
+	hide_error_message();
+	hide_success_message();
 
 	var friend_list = document.getElementsByClassName("friend");
 	for(var itr=0; itr < friend_list.length; itr++){
@@ -105,7 +107,6 @@ function show_search_result(){
 	}
 	document.getElementById("friend_list_header").innerHTML = "Search Results";
 
-	//Make a network request to perform search: based on the given text and return the result
 	//Make search_element class based divs to display inside the friend_list div
 	//search_element class div will have Name, Email ID (hidden characters too), FriendRequest Option (if not a friend)
 
@@ -119,7 +120,21 @@ function show_search_result(){
 			if(xhr.status == 200){
 				var json_response = JSON.parse(xhr.responseText);
 				if(json_response.status == "OK"){
-					display_success_message(json_response.response);
+					var search_list = json_response.response;
+					var div_search_list="";
+
+					if(search_list.length == 0){
+						display_error_message("No search results!");
+						return;
+					}
+
+					for(var itr=0; itr < search_list.length; itr++){
+						div_search_list += "<div id=\""+search_list[itr].id+"\" class=\"friend\" > \
+												<div id=\"friend_username\">"+search_list[itr].username+"</div> \
+												<div id=\"friend_email\" >"+search_list[itr].email+"</div>  \
+											</div>";
+					}
+					document.getElementById("friend_list").innerHTML = div_search_list;
 				}
 				else{
 					display_error_message(json_response.response);
