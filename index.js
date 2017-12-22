@@ -54,12 +54,6 @@ function show_signup_page(){
 }
 
 function show_login_page(){
-
-	//For development ease only.... To be removed after development
-	show_main_page();
-	return;
-	//ends here </>
-
 	document.getElementById("homepage").style.display = "none";
 	document.getElementById("signup_page").style.display = "none";
 	document.getElementById("main_page").style.display = "none";	
@@ -130,11 +124,16 @@ function show_search_result(){
 
 					for(var itr=0; itr < search_list.length; itr++){
 						div_search_list += "<div id=\""+search_list[itr].id+"\" class=\"friend\" > \
-												<div id=\"friend_username\">"+search_list[itr].username+"</div> \
-												<div id=\"friend_email\" >"+search_list[itr].email+"</div>  \
+												<div id=\"friend_username\">"+search_list[itr].username+"</div>\
+												<div id=\"friend_email\">"+search_list[itr].email+"</div>  \
+												<div id=\"friend_request_btn_"+search_list[itr].id+"\" class=\"friend_request_btn\">Send Request!</div>\
 											</div>";
+
 					}
 					document.getElementById("friend_list").innerHTML = div_search_list;
+					for(var itr=0; itr < search_list.length; itr++){
+						document.getElementById("friend_request_btn_"+search_list[itr].id).addEventListener('click', send_friend_request);
+					}
 				}
 				else{
 					display_error_message(json_response.response);
@@ -149,6 +148,43 @@ function show_search_result(){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));	
 
+}
+
+function send_friend_request(){
+
+	if(this.innerHTML != "Send Request!"){
+		return;
+	}
+
+	var friend_id = this.id;
+	friend_id = friend_id.substring(friend_id.lastIndexOf("_")+1);
+
+	// session parameters will also be sent ofc :P
+	var request_body = {
+		"id": friend_id
+	};
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+					// display friend added instead of the button of send request!
+					document.getElementById("friend_request_btn_"+friend_id).innerHTML = "Friend Added!";
+				}
+				else{
+					display_error_message(json_response.response);
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+	xhr.open("POST", "http://localhost/cgi-bin/friend_request.py", true);
+	xhr.setRequestHeader("Accept", "application/json");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(JSON.stringify(request_body));
 }
 
 function is_empty(val){

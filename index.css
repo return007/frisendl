@@ -167,10 +167,19 @@ change upload -> friend after development
 	height: 210px;
 	overflow-y: auto;
 }
+#friend_email{
+	float: left;
+}
+.friend_request_btn{
+	color: red;
+	float: right;
+	padding: 5px;
+	background-color: green;
+	cursor: pointer;
+}
 .friend{
 	background-color: #b1afa6;
 	width: 100%;
-	border-bottom: 1px solid grey; 
-	cursor: pointer;
+	border-bottom: 1px solid grey;
 	height: 50px;
 }
