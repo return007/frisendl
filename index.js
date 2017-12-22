@@ -1,3 +1,5 @@
+var EMAIL, PASSWORD, ID;
+
 document.addEventListener('DOMContentLoaded', function() {
 
 	var signup_btn = document.getElementById('signup_btn');
@@ -74,16 +76,69 @@ function show_main_page(){
 
 	hide_error_message();
 	hide_success_message();
+
+	show_friend_section();
 }
 
 function show_friend_section(){
 	document.getElementById("friend_section").style.display = "block";
-	document.getElementById("upload_section").style.display = "none";	
+	document.getElementById("upload_section").style.display = "none";
+
+	hide_error_message();
+	hide_success_message();
+
+	show_friend_list();
 }
 
 function show_upload_section(){
 	document.getElementById("upload_section").style.display = "block";
 	document.getElementById("friend_section").style.display = "none";	
+}
+
+function show_friend_list(){
+	var request_body = {
+		"id": ID
+	};
+
+	document.getElementById("friend_list_header").innerHTML = "Friends";
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+
+					var friend_list = json_response.response;
+					var div_friend_list = "";
+					if(friend_list.length == 0){
+						display_error_message("No friends to show!");
+						return;
+					}
+
+					for(var itr=0; itr < friend_list.length; itr++){
+						div_friend_list += "<div id=\""+friend_list[itr].id+"\" class=\"friend\" > \
+												<div id=\"friend_username\">"+friend_list[itr].username+"</div>\
+												<div id=\"friend_email\">"+friend_list[itr].email+"</div>  \
+											</div>";
+
+					}
+					document.getElementById("friend_list").innerHTML = div_friend_list;
+				}
+				else{
+					display_error_message(json_response.response);
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+
+	xhr.open("POST", "http://localhost/cgi-bin/friend_list.py", true);
+	xhr.setRequestHeader("Accept", "application/json");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(JSON.stringify(request_body));	
+
 }
 
 function show_search_result(){
@@ -105,6 +160,8 @@ function show_search_result(){
 	//search_element class div will have Name, Email ID (hidden characters too), FriendRequest Option (if not a friend)
 
 	var request_body = {
+		"id": ID,
+		"password": PASSWORD,
 		"q": search_query
 	};
 
@@ -161,7 +218,9 @@ function send_friend_request(){
 
 	// session parameters will also be sent ofc :P
 	var request_body = {
-		"id": friend_id
+		"id": ID,
+		"password": PASSWORD,
+		"friend_id": friend_id
 	};
 
 	var xhr = new XMLHttpRequest();
@@ -275,6 +334,9 @@ function perform_login(){
 		'password': password
 	};
 
+	EMAIL = email;
+	PASSWORD = password;
+
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
@@ -282,7 +344,8 @@ function perform_login(){
 				var json_response = JSON.parse(xhr.responseText);
 				if(json_response.status == "OK"){
 					display_success_message("Successful Login!");
-					setTimeout(show_main_page, 1500);
+					ID = json_response.response;
+					setTimeout(show_main_page, 1000);
 				}
 				else{
 					display_error_message(json_response.response);
