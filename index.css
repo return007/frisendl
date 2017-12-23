@@ -128,6 +128,12 @@
 	cursor: pointer;
 	text-align: center;
 }
+#logout_btn{
+	float: right;
+	cursor: pointer;
+	text-align: center;	
+	margin-right: 50px;
+}
 /*
 change upload -> friend after development
 */

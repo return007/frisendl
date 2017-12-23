@@ -14,5 +14,7 @@
 		"default_icon": "icons/frisendl_logo.svg",
 		"default_title": "Share using frisendl",
 		"default_popup": "index.html"
-	}
+	},
+
+	"permissions": ["storage"]
 }

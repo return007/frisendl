@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	var upload_section_btn = document.getElementById('upload_section_btn');
 	upload_section_btn.addEventListener('click', show_upload_section);
 
+	var logout_btn = document.getElementById('logout_btn');
+	logout_btn.addEventListener('click', perform_logout);
+
 	var go_btn = document.getElementById('go_btn');
 	go_btn.addEventListener('click', show_search_result);
 
@@ -38,6 +41,13 @@ function display_success_message(msg){
 }
 function hide_success_message(){
 	document.getElementById("success").innerHTML = "&nbsp;";
+}
+
+function show_home_page(){
+	document.getElementById("homepage").style.display = "block";
+	document.getElementById("login_page").style.display = "none";
+	document.getElementById("main_page").style.display = "none";	
+	document.getElementById("signup_page").style.display = "none";
 }
 
 function show_signup_page(){
@@ -93,6 +103,15 @@ function show_friend_section(){
 function show_upload_section(){
 	document.getElementById("upload_section").style.display = "block";
 	document.getElementById("friend_section").style.display = "none";	
+}
+
+function perform_logout(){
+	// Erase credentials from storage, unset ID, EMAIL, PASSWORD variables, show homepage :P
+	var removing_credentials = browser.storage.local.remove('credentials');
+	removing_credentials.then(() => {
+		ID = EMAIL = PASSWORD = null;
+		show_home_page();
+	}, display_error_message);
 }
 
 function show_friend_list(){
@@ -345,6 +364,15 @@ function perform_login(){
 				if(json_response.status == "OK"){
 					display_success_message("Successful Login!");
 					ID = json_response.response;
+
+					var credentials = {
+						email: EMAIL,
+						password: PASSWORD,
+						id: ID
+					};
+					var setting_credentials = browser.storage.local.set({credentials: credentials});
+					setting_credentials.then(null, display_error_message);
+
 					setTimeout(show_main_page, 1000);
 				}
 				else{
@@ -359,4 +387,30 @@ function perform_login(){
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));
+}
+
+init();
+
+function init(){
+	// check if there has been a previous login, if yes obtain credentials from storage and automatically perform login
+	// if now, leave it as it as
+
+	var getting_credentials = browser.storage.local.get('credentials');
+	getting_credentials.then((result) => {
+
+		var credentials = result.credentials;
+		var id = credentials.id;
+		var password = credentials.password;
+		var email = credentials.email;
+
+		if(id != null && password != null && email != null){
+			// attempt to login and check if the ids match :P
+			// if all is done, display main_page
+
+			ID = id;
+			EMAIL = email;
+			PASSWORD = password;
+			show_main_page();
+		}
+	}, display_error_message);
 }
