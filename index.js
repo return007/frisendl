@@ -407,10 +407,15 @@ function init(){
 			// attempt to login and check if the ids match :P
 			// if all is done, display main_page
 
+			//check if login credentials are correct
+
 			ID = id;
 			EMAIL = email;
 			PASSWORD = password;
 			show_main_page();
+		}
+		else{
+			show_home_page();
 		}
 	}, display_error_message);
 }
