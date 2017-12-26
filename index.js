@@ -1,5 +1,6 @@
 var EMAIL, PASSWORD, ID;
 var FRIEND_ID_TO_NAME = new Map();
+var BASE_SERVER_URL = "http://localhost";
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -170,7 +171,7 @@ function show_friend_list(){
 		}
 	};
 
-	xhr.open("POST", "http://localhost/cgi-bin/friend_list.py", true);
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/friend_list.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));	
@@ -236,7 +237,7 @@ function show_search_result(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", "http://localhost/cgi-bin/search_friend.py", true);
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/search_friend.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));	
@@ -276,7 +277,7 @@ function send_friend_request(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", "http://localhost/cgi-bin/friend_request.py", true);
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/friend_request.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));
@@ -344,7 +345,7 @@ function perform_signup(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", "http://localhost/cgi-bin/signup.py", true);
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/signup.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));
@@ -400,7 +401,7 @@ function perform_login(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", "http://localhost/cgi-bin/login.py", true);
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/login.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));
@@ -452,7 +453,7 @@ function init(){
 						display_error_message("Unsuccessful HTTP Request!");
 				}
 			};
-			xhr.open("POST", "http://localhost/cgi-bin/login.py", true);
+			xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/login.py", true);
 			xhr.setRequestHeader("Accept", "application/json");
 			xhr.setRequestHeader("Content-Type", "application/json");
 			xhr.send(JSON.stringify(request_body));
@@ -479,10 +480,50 @@ function display_chatbox(){
 	document.getElementById('chat_header').innerHTML = FRIEND_ID_TO_NAME.get(TO_ID+"");
 
 	document.getElementById('chat_container').innerHTML = "<ol class=\"chat\" id=\""+CURR_CHATBOX_ID+"\"></ol>";
-	if(CHATBOX_MAP.get(CURR_CHATBOX_ID) == undefined){
-		CHATBOX_MAP.set(CURR_CHATBOX_ID, "");
-	}
-	document.getElementById(CURR_CHATBOX_ID).innerHTML = CHATBOX_MAP.get(CURR_CHATBOX_ID);
+
+	// Get all messages from server pertaining to this friend_id
+	var request_body = {
+		'id': ID,
+		'password': PASSWORD,
+		'friend_id': TO_ID
+	};
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+					// Display the new messages received :O
+					var message_list = json_response.response;
+					var fetched_message = "";
+					for(var itr=0; itr < message_list.length; itr++){
+						var curr = new Date();
+						var display_time = curr.getHours() + ":" + curr.getMinutes();
+						fetched_message += create_message_box(message_list[itr], display_time, "other");
+					}
+
+					if(CHATBOX_MAP.get(CURR_CHATBOX_ID) == undefined){
+						CHATBOX_MAP.set(CURR_CHATBOX_ID, fetched_message);
+					}
+					else{
+						CHATBOX_MAP.set(CURR_CHATBOX_ID, CHATBOX_MAP.get(CURR_CHATBOX_ID)+fetched_message);
+					}
+					document.getElementById(CURR_CHATBOX_ID).innerHTML = CHATBOX_MAP.get(CURR_CHATBOX_ID);
+				}
+				else{
+					display_error_message(json_response.response);
+
+					// try to refetch the message since it was not fetched previously
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/receive_message.py", true);
+	xhr.setRequestHeader("Accept", "application/json");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(JSON.stringify(request_body));	
 }
 function create_message_box(message, time, message_class){
 	return "<li class=\""+message_class+"\"> \
@@ -513,6 +554,35 @@ function send_message(){
 	var chat_container = document.getElementById('chat_container');
 	chat_container.scrollTop = chat_container.scrollHeight;
 
-	// Send message to server 
+	// Send message to server
+	var request_body = {
+		'id': ID,
+		'password': PASSWORD,
+		'friend_id': TO_ID,
+		'message': message_content
+	};
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+					// Be happy now... Message sent :D
+					display_success_message(json_response.response);
+				}
+				else{
+					display_error_message(json_response.response);
 
+					// try to resend the message since it was not sent previously :(
+					// Implementation : Important
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/send_message.py", true);
+	xhr.setRequestHeader("Accept", "application/json");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(JSON.stringify(request_body));
 }
