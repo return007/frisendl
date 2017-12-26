@@ -189,3 +189,129 @@ change upload -> friend after development
 	border-bottom: 1px solid grey;
 	height: 50px;
 }
+#chat_section{
+	display: none;
+}
+.send_message_btn{
+	color: blue;
+	background-color: white;
+	padding: 4px;
+	float: right;
+	cursor: pointer;
+}
+#chat_header{
+	color: white;
+	background-color: #b1afa6;
+	width: 100%;
+	font: 20px;
+	text-align: center;
+	margin-top: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+#chat_container{
+	height: 240px;
+	border: 2px solid black;
+	margin-top: 5px;
+	overflow-y: scroll;
+}
+#message_input_field{
+	font-size: 14px;
+	font-weight: 500;
+	width: 300px;
+	height: 40px;
+	resize: none;
+}
+#message_send_btn{
+	font-size: 14px;
+	height: 40px;
+	margin-bottom: 10px;
+	float: right;
+	text-align: center;
+
+}
+#message_input{
+	margin-top: 5px;
+}
+.chat{
+	list-style: none;
+	margin: 0;
+	padding: 0 0 50px 0;
+}
+.chat li {
+	padding: 10px 8px 0 8px;
+	overflow: hidden;
+	display: flex;
+}
+.chat .day {
+	position: relative;
+	display: block;
+	text-align: center;
+	color: #c0c0c0;
+	height: 20px;
+	text-shadow: 7px 0px 0px #e5e5e5, 6px 0px 0px #e5e5e5, 5px 0px 0px #e5e5e5, 4px 0px 0px #e5e5e5, 3px 0px 0px #e5e5e5, 2px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 0px 0px 0px #e5e5e5, -1px 0px 0px #e5e5e5, -2px 0px 0px #e5e5e5, -3px 0px 0px #e5e5e5, -4px 0px 0px #e5e5e5, -5px 0px 0px #e5e5e5, -6px 0px 0px #e5e5e5, -7px 0px 0px #e5e5e5;
+	box-shadow: inset 20px 0px 0px #e5e5e5, inset -20px 0px 0px #e5e5e5, inset 0px -2px 0px #d7d7d7;
+	line-height: 38px;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
+.msg {
+	background: white;
+	min-width: 50px;
+	padding: 7px;
+	border-radius: 5px;
+	box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.07);
+	max-width: 250px;
+}
+.other .msg {
+	order: 1;
+	border-top-left-radius: 0px;
+	box-shadow: -1px 2px 0px #D4D4D4;
+}
+.other:before {
+	content: "";
+	position: relative;
+	top: 0px;
+	right: 0px;
+	left: 40px;
+	width: 0px;
+	height: 0px;
+	border: 5px solid #fff;
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+}
+.self {
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+.self .msg {
+	order: 1;
+	border-bottom-right-radius: 0px;
+	box-shadow: 1px 2px 0px #D4D4D4;
+	background-color: #166678;
+}
+.msg pre {
+	font-size: 0.8rem;
+	font-family: sans-serif;
+	margin: 0 0 0 0;
+	color: #000;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+.msg time {
+	font-size: 0.6rem;
+	color: #ccc;
+	margin-top: 3px;
+	float: right;
+	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}

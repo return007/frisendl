@@ -1,4 +1,5 @@
 var EMAIL, PASSWORD, ID;
+var FRIEND_ID_TO_NAME = new Map();
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -25,6 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	var go_btn = document.getElementById('go_btn');
 	go_btn.addEventListener('click', show_search_result);
+
+	var message_send_btn = document.getElementById('message_send_btn');
+	message_send_btn.addEventListener('click', send_message);
 
 });
 
@@ -93,6 +97,7 @@ function show_main_page(){
 function show_friend_section(){
 	document.getElementById("friend_section").style.display = "block";
 	document.getElementById("upload_section").style.display = "none";
+	document.getElementById('chat_section').style.display = 'none';
 
 	hide_error_message();
 	hide_success_message();
@@ -103,6 +108,8 @@ function show_friend_section(){
 function show_upload_section(){
 	document.getElementById("upload_section").style.display = "block";
 	document.getElementById("friend_section").style.display = "none";	
+	document.getElementById('chat_section').style.display = 'none';
+
 }
 
 function perform_logout(){
@@ -139,10 +146,20 @@ function show_friend_list(){
 						div_friend_list += "<div id=\""+friend_list[itr].id+"\" class=\"friend\" > \
 												<div id=\"friend_username\">"+friend_list[itr].username+"</div>\
 												<div id=\"friend_email\">"+friend_list[itr].email+"</div>  \
+												<div id=\"send_message_"+friend_list[itr].id+"\" class=\"send_message_btn\">Send Message!</div>  \
 											</div>";
 
+						//FRIEND_ID_LIST.push(friend_list[itr].id);
 					}
 					document.getElementById("friend_list").innerHTML = div_friend_list;
+
+					for(var itr=0; itr < friend_list.length; itr++){
+						document.getElementById("send_message_"+friend_list[itr].id).addEventListener('click', display_chatbox);
+						FRIEND_ID_TO_NAME.set(friend_list[itr].id, friend_list[itr].username);
+					}
+					for(var itr=0; itr < friend_list.length; itr++){
+						FRIEND_ID_TO_NAME.set(friend_list[itr].id+"", friend_list[itr].username);
+					}
 				}
 				else{
 					display_error_message(json_response.response);
@@ -408,14 +425,94 @@ function init(){
 			// if all is done, display main_page
 
 			//check if login credentials are correct
-
-			ID = id;
-			EMAIL = email;
-			PASSWORD = password;
-			show_main_page();
+			var request_body = {
+				'email': email,
+				'password': password
+			};
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function(){
+				if (xhr.readyState == 4) {
+					if(xhr.status == 200){
+						var json_response = JSON.parse(xhr.responseText);
+						if(json_response.status == "OK"){
+							fetched_id = json_response.response;
+							if(fetched_id == id){
+								// Valid login :P
+								ID = id;
+								EMAIL = email;
+								PASSWORD = password;
+								show_main_page();
+							}
+						}
+						else{
+							display_error_message(json_response.response);
+						}
+					}
+					else
+						display_error_message("Unsuccessful HTTP Request!");
+				}
+			};
+			xhr.open("POST", "http://localhost/cgi-bin/login.py", true);
+			xhr.setRequestHeader("Accept", "application/json");
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(JSON.stringify(request_body));
 		}
 		else{
 			show_home_page();
 		}
 	}, display_error_message);
+}
+
+var FROM_ID, TO_ID, MESSAGE, CURR_CHATBOX_ID;
+var CHATBOX_MAP = new Map();
+
+function display_chatbox(){
+	var friend_id = this.id;
+	friend_id = friend_id.substring(friend_id.lastIndexOf("_")+1);
+
+	FROM_ID = ID;
+	TO_ID = friend_id;
+	CURR_CHATBOX_ID = "chat_box_"+TO_ID;
+
+	document.getElementById('friend_section').style.display = 'none';
+	document.getElementById('chat_section').style.display = 'block';
+	document.getElementById('chat_header').innerHTML = FRIEND_ID_TO_NAME.get(TO_ID+"");
+
+	document.getElementById('chat_container').innerHTML = "<ol class=\"chat\" id=\""+CURR_CHATBOX_ID+"\"></ol>";
+	if(CHATBOX_MAP.get(CURR_CHATBOX_ID) == undefined){
+		CHATBOX_MAP.set(CURR_CHATBOX_ID, "");
+	}
+	document.getElementById(CURR_CHATBOX_ID).innerHTML = CHATBOX_MAP.get(CURR_CHATBOX_ID);
+}
+function create_message_box(message, time, message_class){
+	return "<li class=\""+message_class+"\"> \
+				<div class=\"msg\"> \
+					<pre>"+message+"</pre>\
+					<time>"+time+"</time>\
+				</div>\
+			</li>";
+}
+function send_message(){
+	var message_content = document.getElementById('message_input_field').value;
+	if(is_empty(message_content)){
+		return;
+	}
+	var chat_ol = document.getElementById(CURR_CHATBOX_ID);
+	
+	var curr = new Date();
+	var display_time = curr.getHours() + ":" + curr.getMinutes();
+
+	var previous_messages = chat_ol.innerHTML;
+	previous_messages += create_message_box(message_content, display_time, "self");
+	chat_ol.innerHTML = previous_messages;
+
+	CHATBOX_MAP.set(CURR_CHATBOX_ID, previous_messages);
+
+	document.getElementById('message_input_field').value = "";
+
+	var chat_container = document.getElementById('chat_container');
+	chat_container.scrollTop = chat_container.scrollHeight;
+
+	// Send message to server 
+
 }
