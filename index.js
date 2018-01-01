@@ -2,6 +2,18 @@ var EMAIL, PASSWORD, ID;
 var FRIEND_ID_TO_NAME = new Map();
 var BASE_SERVER_URL = "http://localhost";
 
+var WINDOW = {
+	"HOMEPAGE": "homepage",
+	"SIGNUPPAGE": "signup_page",
+	"LOGINPAGE": "login_page",
+	"FRIEND_SECTION": "friend_section",
+	"UPLOAD_SECTION": "upload_section",
+	"SEARCH_SECTION": "search_result_section",
+	"CHAT_SECTION": "chat_section"
+};
+
+var CURR_WINDOW = WINDOW.HOMEPAGE;
+
 document.addEventListener('DOMContentLoaded', function() {
 
 	var signup_btn = document.getElementById('signup_btn');
@@ -53,6 +65,8 @@ function show_home_page(){
 	document.getElementById("login_page").style.display = "none";
 	document.getElementById("main_page").style.display = "none";	
 	document.getElementById("signup_page").style.display = "none";
+
+	CURR_WINDOW = WINDOW.HOMEPAGE;
 }
 
 function show_signup_page(){
@@ -68,6 +82,8 @@ function show_signup_page(){
 	document.getElementById("email").addEventListener('keypress', hide_error_message);
 	document.getElementById("password").addEventListener('keypress', hide_error_message);
 	document.getElementById("confirm_password").addEventListener('keypress', hide_error_message);
+
+	CURR_WINDOW = WINDOW.SIGNUPPAGE;
 }
 
 function show_login_page(){
@@ -81,6 +97,8 @@ function show_login_page(){
 
 	document.getElementById("email").addEventListener('keypress', hide_error_message);
 	document.getElementById("password").addEventListener('keypress', hide_error_message);
+
+	CURR_WINDOW = WINDOW.LOGINPAGE;
 }
 
 function show_main_page(){
@@ -104,6 +122,8 @@ function show_friend_section(){
 	hide_success_message();
 
 	show_friend_list();
+
+	CURR_WINDOW = WINDOW.FRIEND_SECTION;
 }
 
 function show_upload_section(){
@@ -111,6 +131,7 @@ function show_upload_section(){
 	document.getElementById("friend_section").style.display = "none";	
 	document.getElementById('chat_section').style.display = 'none';
 
+	CURR_WINDOW = WINDOW.UPLOAD_SECTION;
 }
 
 function perform_logout(){
@@ -241,6 +262,8 @@ function show_search_result(){
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));	
+
+	CURR_WINDOW = WINDOW.SEARCH_SECTION;
 
 }
 
@@ -523,7 +546,9 @@ function display_chatbox(){
 	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/receive_message.py", true);
 	xhr.setRequestHeader("Accept", "application/json");
 	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));	
+	xhr.send(JSON.stringify(request_body));
+
+	CURR_WINDOW = WINDOW.CHAT_SECTION;
 }
 function create_message_box(message, time, message_class){
 	return "<li class=\""+message_class+"\"> \
@@ -586,3 +611,54 @@ function send_message(){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(JSON.stringify(request_body));
 }
+
+// Polling Implementation :: General implementation, working based on window name, works infinitely as long as the add-on window is open
+function polling(){
+	var server_url, request_body;
+	switch(CURR_WINDOW){
+		case WINDOW.HOMEPAGE: 
+		case WINDOW.LOGINPAGE:
+		case WINDOW.SIGNUPPAGE: 
+		case WINDOW.SEARCH_SECTION: return;
+
+		case WINDOW.FRIEND_SECTION: server_url = "/cgi-bin/friend_section_notification.py";
+									request_body = {
+										'id': ID,
+										'password': PASSWORD
+									};
+									break;
+	}
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+					var friend_list = json_response.response;
+					if(friend_list.length == 0){
+						return;
+					}
+
+					for(var itr=0; itr < friend_list.length; itr++){
+						document.getElementById(""+friend_list[itr]).style.backgroundColor = "red";
+					}
+				}
+				else{
+					display_error_message(json_response.response);
+					
+					// try to resend the message since it was not sent previously :(
+					// Implementation : Important
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+	xhr.open("POST", BASE_SERVER_URL+server_url, true);
+	xhr.setRequestHeader("Accept", "application/json");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(JSON.stringify(request_body));	
+}
+
+setInterval(polling, 1500);
