@@ -1,6 +1,6 @@
 var EMAIL, PASSWORD, ID;
 var FRIEND_ID_TO_NAME = new Map();
-var BASE_SERVER_URL = "http://localhost";
+var BASE_SERVER_URL = "http://192.168.0.3";
 
 var WINDOW = {
 	"HOMEPAGE": "homepage",
@@ -627,6 +627,14 @@ function polling(){
 										'password': PASSWORD
 									};
 									break;
+
+		case WINDOW.CHAT_SECTION: 	server_url = "/cgi-bin/receive_message.py";
+									request_body = {
+										'id': ID,
+										'password': PASSWORD,
+										'friend_id': TO_ID
+									};
+									break;
 	}
 
 	var xhr = new XMLHttpRequest();
@@ -635,18 +643,41 @@ function polling(){
 			if(xhr.status == 200){
 				var json_response = JSON.parse(xhr.responseText);
 				if(json_response.status == "OK"){
-					var friend_list = json_response.response;
-					if(friend_list.length == 0){
-						return;
-					}
 
-					for(var itr=0; itr < friend_list.length; itr++){
-						document.getElementById(""+friend_list[itr]).style.backgroundColor = "red";
+					var response_url = xhr.responseURL
+
+					if(CURR_WINDOW == WINDOW.FRIEND_SECTION && BASE_SERVER_URL+server_url == response_url){
+						var friend_list = json_response.response;
+						if(friend_list.length == 0){
+							return;
+						}
+						for(var itr=0; itr < friend_list.length; itr++){
+							document.getElementById(""+friend_list[itr]).style.backgroundColor = "red";
+						}
+					}
+					else if(CURR_WINDOW == WINDOW.CHAT_SECTION && BASE_SERVER_URL+server_url == response_url){
+						var message_list = json_response.response;
+						var fetched_message = "";
+						for(var itr=0; itr < message_list.length; itr++){
+							var curr = new Date();
+							var display_time = curr.getHours() + ":" + curr.getMinutes();
+							fetched_message += create_message_box(message_list[itr], display_time, "other");
+						}
+
+						if(CHATBOX_MAP.get(CURR_CHATBOX_ID) == undefined){
+							CHATBOX_MAP.set(CURR_CHATBOX_ID, fetched_message);
+						}
+						else{
+							CHATBOX_MAP.set(CURR_CHATBOX_ID, CHATBOX_MAP.get(CURR_CHATBOX_ID)+fetched_message);
+						}
+						if(fetched_message != ""){
+							document.getElementById(CURR_CHATBOX_ID).innerHTML = CHATBOX_MAP.get(CURR_CHATBOX_ID);
+						}						
 					}
 				}
 				else{
 					display_error_message(json_response.response);
-					
+
 					// try to resend the message since it was not sent previously :(
 					// Implementation : Important
 				}
@@ -661,4 +692,4 @@ function polling(){
 	xhr.send(JSON.stringify(request_body));	
 }
 
-setInterval(polling, 1500);
+setInterval(polling, 2000);
