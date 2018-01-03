@@ -1,6 +1,6 @@
 var EMAIL, PASSWORD, ID;
 var FRIEND_ID_TO_NAME = new Map();
-var BASE_SERVER_URL = "http://192.168.0.3";
+var BASE_SERVER_URL = "http://localhost";
 
 var WINDOW = {
 	"HOMEPAGE": "homepage",
@@ -44,6 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	message_send_btn.addEventListener('click', send_message);
 
 });
+
+function JSON_to_FormData(json_data){
+	var form_data = new FormData();
+	for(var key in json_data){
+		form_data.append(key, json_data[key]);
+	}
+	return form_data;
+}
 
 function display_error_message(msg){
 	document.getElementById("error").innerHTML = msg;
@@ -148,6 +156,8 @@ function show_friend_list(){
 		"id": ID
 	};
 
+	var form_data = JSON_to_FormData(request_body);
+
 	document.getElementById("friend_list_header").innerHTML = "Friends";
 
 	var xhr = new XMLHttpRequest();
@@ -193,10 +203,7 @@ function show_friend_list(){
 	};
 
 	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/friend_list.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));	
-
+	xhr.send(form_data);
 }
 
 function show_search_result(){
@@ -222,6 +229,8 @@ function show_search_result(){
 		"password": PASSWORD,
 		"q": search_query
 	};
+
+	var form_data = JSON_to_FormData(request_body);
 
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
@@ -258,10 +267,8 @@ function show_search_result(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/search_friend.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));	
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/search_friend.py");
+	xhr.send(form_data);	
 
 	CURR_WINDOW = WINDOW.SEARCH_SECTION;
 
@@ -283,6 +290,8 @@ function send_friend_request(){
 		"friend_id": friend_id
 	};
 
+	var form_data = JSON_to_FormData(request_body);
+
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
@@ -300,10 +309,8 @@ function send_friend_request(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/friend_request.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/friend_request.py");
+	xhr.send(form_data);
 }
 
 function is_empty(val){
@@ -351,6 +358,8 @@ function perform_signup(){
 		'password': password
 	};
 
+	var form_data = JSON_to_FormData(request_body);
+
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
@@ -368,10 +377,8 @@ function perform_signup(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/signup.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/signup.py");
+	xhr.send(form_data);
 
 }
 
@@ -393,6 +400,8 @@ function perform_login(){
 		'email': email,
 		'password': password
 	};
+
+	var form_data = JSON_to_FormData(request_body);
 
 	EMAIL = email;
 	PASSWORD = password;
@@ -424,10 +433,8 @@ function perform_login(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/login.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/login.py");
+	xhr.send(form_data);
 }
 
 init();
@@ -453,6 +460,9 @@ function init(){
 				'email': email,
 				'password': password
 			};
+
+			var form_data = JSON_to_FormData(request_body);
+
 			var xhr = new XMLHttpRequest();
 			xhr.onreadystatechange = function(){
 				if (xhr.readyState == 4) {
@@ -477,9 +487,7 @@ function init(){
 				}
 			};
 			xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/login.py", true);
-			xhr.setRequestHeader("Accept", "application/json");
-			xhr.setRequestHeader("Content-Type", "application/json");
-			xhr.send(JSON.stringify(request_body));
+			xhr.send(form_data);
 		}
 		else{
 			show_home_page();
@@ -510,6 +518,9 @@ function display_chatbox(){
 		'password': PASSWORD,
 		'friend_id': TO_ID
 	};
+
+	var form_data = JSON_to_FormData(request_body);
+
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
@@ -543,10 +554,8 @@ function display_chatbox(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/receive_message.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/receive_message.py");
+	xhr.send(form_data);
 
 	CURR_WINDOW = WINDOW.CHAT_SECTION;
 }
@@ -586,6 +595,8 @@ function send_message(){
 		'friend_id': TO_ID,
 		'message': message_content
 	};
+	var form_data = JSON_to_FormData(request_body);
+
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
 		if (xhr.readyState == 4) {
@@ -606,10 +617,8 @@ function send_message(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/send_message.py", true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/send_message.py");
+	xhr.send(form_data);
 }
 
 // Polling Implementation :: General implementation, working based on window name, works infinitely as long as the add-on window is open
@@ -636,6 +645,8 @@ function polling(){
 									};
 									break;
 	}
+
+	var form_data = JSON_to_FormData(request_body);
 
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
@@ -686,10 +697,8 @@ function polling(){
 				display_error_message("Unsuccessful HTTP Request!");
 		}
 	};
-	xhr.open("POST", BASE_SERVER_URL+server_url, true);
-	xhr.setRequestHeader("Accept", "application/json");
-	xhr.setRequestHeader("Content-Type", "application/json");
-	xhr.send(JSON.stringify(request_body));	
+	xhr.open("POST", BASE_SERVER_URL+server_url);
+	xhr.send(form_data);	
 }
 
 setInterval(polling, 2000);
