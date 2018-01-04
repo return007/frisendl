@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	var message_send_btn = document.getElementById('message_send_btn');
 	message_send_btn.addEventListener('click', send_message);
 
+	var webpage_send_btn = document.getElementById('webpage_send_btn');
+	webpage_send_btn.addEventListener('click', send_webpage_message);
+
 });
 
 function JSON_to_FormData(json_data){
@@ -569,6 +572,60 @@ function create_message_box(message, time, message_class){
 }
 function send_message(){
 	var message_content = document.getElementById('message_input_field').value;
+	if(is_empty(message_content)){
+		return;
+	}
+	var chat_ol = document.getElementById(CURR_CHATBOX_ID);
+	
+	var curr = new Date();
+	var display_time = curr.getHours() + ":" + curr.getMinutes();
+
+	var previous_messages = chat_ol.innerHTML;
+	previous_messages += create_message_box(message_content, display_time, "self");
+	chat_ol.innerHTML = previous_messages;
+
+	CHATBOX_MAP.set(CURR_CHATBOX_ID, previous_messages);
+
+	document.getElementById('message_input_field').value = "";
+
+	var chat_container = document.getElementById('chat_container');
+	chat_container.scrollTop = chat_container.scrollHeight;
+
+	// Send message to server
+	var request_body = {
+		'id': ID,
+		'password': PASSWORD,
+		'friend_id': TO_ID,
+		'message': message_content
+	};
+	var form_data = JSON_to_FormData(request_body);
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState == 4) {
+			if(xhr.status == 200){
+				var json_response = JSON.parse(xhr.responseText);
+				if(json_response.status == "OK"){
+					// Be happy now... Message sent :D
+					display_success_message(json_response.response);
+				}
+				else{
+					display_error_message(json_response.response);
+
+					// try to resend the message since it was not sent previously :(
+					// Implementation : Important
+				}
+			}
+			else
+				display_error_message("Unsuccessful HTTP Request!");
+		}
+	};
+	xhr.open("POST", BASE_SERVER_URL+"/cgi-bin/send_message.py");
+	xhr.send(form_data);
+}
+
+function send_webpage_message(){
+	var message_content = "Web page link goes here";
 	if(is_empty(message_content)){
 		return;
 	}

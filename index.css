@@ -210,7 +210,7 @@ change upload -> friend after development
 	padding-bottom: 5px;
 }
 #chat_container{
-	height: 240px;
+	height: 210px;
 	border: 2px solid black;
 	margin-top: 5px;
 	overflow-y: scroll;
@@ -314,4 +314,9 @@ change upload -> friend after development
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
+}
+#webpage_send_btn, #file_upload_btn{
+	width: 49%;
+	height: 30px;
+	margin-top: 5px;
 }
